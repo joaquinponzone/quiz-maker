@@ -2,8 +2,6 @@
 
 > Transform any PDF or Markdown document into an interactive quiz using AI
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fjoaquinponzone%2Fquiz-maker&env=OPENAI_API_KEY&envDescription=OpenAI%20API%20Key%20for%20quiz%20generation&envLink=https%3A%2F%2Fplatform.openai.com%2Fapi-keys)
-
 ## ✨ Features
 
 - **📄 Multi-Format Support**: Upload PDF or Markdown files
