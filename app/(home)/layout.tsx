@@ -3,6 +3,7 @@ import { Metadata } from "next";
 import { Toaster } from "sonner";
 import { ThemeProvider } from "next-themes";
 import { Poppins, Lora } from "next/font/google";
+import { Analytics } from '@vercel/analytics/next';
 
 const poppins = Poppins({ 
   subsets: ["latin"],
@@ -47,6 +48,7 @@ export default function RootLayout({
               </a>
             </div>
           </footer>
+          <Analytics />
         </ThemeProvider>
       </body>
     </html>
