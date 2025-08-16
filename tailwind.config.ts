@@ -43,6 +43,10 @@ const config: Config = {
           DEFAULT: "var(--card)",
           foreground: "var(--card-foreground)",
         },
+        success: {
+          DEFAULT: "var(--success)",
+          foreground: "var(--success-foreground)",
+        },
         sidebar: {
           DEFAULT: "var(--sidebar)",
           foreground: "var(--sidebar-foreground)",

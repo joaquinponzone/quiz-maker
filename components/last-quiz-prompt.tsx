@@ -21,7 +21,7 @@ export default function LastQuizPrompt({
       <Card className="w-full max-w-xl shadow-lg p-6">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl font-bold">¿Continuar con el último cuestionario?</CardTitle>
-          <CardDescription className="text-md text-muted-foreground text-pretty">
+          <CardDescription className="text-md text-muted-foreground">
             Se encontró un cuestionario generado anteriormente: {lastQuiz.fileName}
           </CardDescription>
         </CardHeader>
@@ -29,14 +29,14 @@ export default function LastQuizPrompt({
           <Button
             variant="secondary"
             onClick={() => onContinueLastQuiz(lastQuiz.questions, lastQuiz.title)}
-            className="flex gap-2 w-full shadow-md hover:shadow-lg transition-shadow text-md"
+            className="flex gap-2 w-full shadow-md hover:shadow-lg transition-shadow text-sm sm:text-md"
           >
             <RefreshCcw /> Repetir el último cuestionario
           </Button>
           <Button
             onClick={onGenerateNewQuiz}
             variant="outline"
-            className="flex gap-2 w-full shadow-md hover:shadow-lg transition-shadow text-md"
+            className="flex gap-2 w-full shadow-md hover:shadow-lg transition-shadow text-sm sm:text-md"
           >
             <FilePlus2 /> Generar nuevo cuestionario
           </Button>

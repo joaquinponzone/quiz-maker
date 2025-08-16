@@ -20,12 +20,12 @@ export default function GenerationCounter({
   const isAtLimit = remainingGenerations === 0;
 
   return (
-    <div className="p-3 rounded-lg border shadow-sm bg-muted/30">
-      <div className="flex items-center justify-between mb-2">
+    <div className="p-2 rounded-lg border shadow-sm bg-muted/30">
+      <div className="flex items-center justify-between">
         <div className="flex items-center space-x-2">
           <FileText className="h-4 w-4 text-muted-foreground" />
           <span className="text-sm font-medium text-foreground">
-            Generaciones de Cuestionarios
+            Generaciones
           </span>
         </div>
         <Badge 

@@ -9,7 +9,6 @@ interface LoadingScreenProps {
 
 export default function LoadingScreen({ message = "Chequeando cache..." }: LoadingScreenProps) {
   return (
-    <div className="min-h-screen bg-background text-foreground flex items-start justify-center">
       <Card className="w-full max-w-md shadow-lg p-6 mt-32">
         <CardHeader className="text-center">
           <div className="flex flex-col items-center justify-center gap-2">
@@ -18,6 +17,5 @@ export default function LoadingScreen({ message = "Chequeando cache..." }: Loadi
           </div>
         </CardHeader>
       </Card>
-    </div>
   );
 }

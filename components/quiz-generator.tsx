@@ -141,166 +141,165 @@ export default function QuizGenerator({
   const progressValue = partialQuestions ? (partialQuestions.length / 4) * 100 : 0;
 
   return (
-    <main className="flex flex-col h-full">
-      <div
-        className="sm:flex-1 mx-auto w-[80%] sm:w-full flex justify-center"
-        onDragOver={(e) => {
-          if (isGenerating) return;
-          e.preventDefault();
-          setIsDragging(true);
-        }}
-        onDragExit={() => {
-          if (isGenerating) return;
-          setIsDragging(false);
-        }}
-        onDragEnd={() => {
-          if (isGenerating) return;
-          setIsDragging(false);
-        }}
-        onDragLeave={() => {
-          if (isGenerating) return;
-          setIsDragging(false);
-        }}
-        onDrop={(e) => {
-          if (isGenerating) return;
-          e.preventDefault();
-          setIsDragging(false);
-          const files = e.dataTransfer.files;
-          if (files && files.length > 0) {
-            const file = files[0];
-            const validation = validateFile(file);
+    <div
+      className="sm:flex-1 mx-auto w-[90%] sm:w-full flex justify-center"
+      onDragOver={(e) => {
+        if (isGenerating) return;
+        e.preventDefault();
+        setIsDragging(true);
+      }}
+      onDragExit={() => {
+        if (isGenerating) return;
+        setIsDragging(false);
+      }}
+      onDragEnd={() => {
+        if (isGenerating) return;
+        setIsDragging(false);
+      }}
+      onDragLeave={() => {
+        if (isGenerating) return;
+        setIsDragging(false);
+      }}
+      onDrop={(e) => {
+        if (isGenerating) return;
+        e.preventDefault();
+        setIsDragging(false);
+        const files = e.dataTransfer.files;
+        if (files && files.length > 0) {
+          const file = files[0];
+          const validation = validateFile(file);
 
-            if (!validation.success) {
-              toast.error(validation.error);
-              return;
-            }
-
-            setSelectedFile(file);
-            toast.success("¡Archivo listo para procesar!");
+          if (!validation.success) {
+            toast.error(validation.error);
+            return;
           }
-        }}
-      >
-        <AnimatePresence>
-          {isDragging && (
-            <motion.div
-              className="fixed pointer-events-none dark:bg-zinc-900/90 h-dvh w-dvw z-10 justify-center items-center flex flex-col gap-1 bg-zinc-100/90"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-            >
-              <div>Arrastra y suelta archivos aquí</div>
-              <div className="text-sm dark:text-zinc-400 text-zinc-500">
-                {"(Archivos PDF y Markdown)"}
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-        <Card className="w-full max-w-md h-full border mt-12 shadow-lg">
-          <CardHeader className="text-center space-y-6">
-            <div className="mx-auto flex items-center justify-center space-x-2 text-muted-foreground">
-              <div className="rounded-full bg-primary/10 p-2">
-                <FileUp className="h-6 w-6 text-primary" />
-              </div>
-              <Plus className="h-4 w-4 text-muted-foreground" />
-              <div className="rounded-full bg-primary/10 p-2">
-                <Loader2 className="h-6 w-6 text-primary" />
-              </div>
+
+          setSelectedFile(file);
+          toast.success("¡Archivo listo para procesar!");
+        }
+      }}
+    >
+      <AnimatePresence>
+        {isDragging && (
+          <motion.div
+            className="fixed pointer-events-none dark:bg-zinc-900/90 h-dvh w-dvw z-10 justify-center items-center flex flex-col gap-1 bg-zinc-100/90"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <div>Arrastra y suelta archivos aquí</div>
+            <div className="text-sm dark:text-zinc-400 text-zinc-500">
+              {"(Archivos PDF y Markdown)"}
             </div>
-            <div className="space-y-2">
-              <CardTitle className="text-2xl font-bold text-foreground">
-                Quiz Maker
-              </CardTitle>
-              <CardDescription className="text-base text-muted-foreground">
-                <p>
-                  Subí un archivo PDF o Markdown para generar un cuestionario interactivo basado en su contenido usando AI 🤖
-                </p>
-              </CardDescription>
+          </motion.div>
+        )}
+      </AnimatePresence>
+      <Card className="w-full max-w-md h-full border sm:mt-12 shadow-lg">
+        <CardHeader className="text-center sm:space-y-6">
+          <div className="mx-auto flex items-center justify-center space-x-2 text-muted-foreground">
+            <div className="rounded-full bg-primary/10 p-2">
+              <FileUp className="size-6 text-primary" />
             </div>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {/* Generation Counter */}
-            <GenerationCounter
-              currentCount={generationCount}
-              maxGenerations={100}
-              remainingGenerations={remainingGenerations}
-            />
-
-            {selectedFile && (
-              <div className="p-3 rounded-lg border shadow-sm bg-green-50 dark:bg-green-950/20 border-green-200 dark:border-green-800">
-                <div className="flex items-center space-x-2">
-                  <FileText className="h-4 w-4 text-green-600 dark:text-green-400" />
-                  <span className="text-sm font-medium text-green-800 dark:text-green-200">
-                    Archivo listo para procesar: {selectedFile.name}
-                  </span>
-                </div>
-              </div>
-            )}
-
-            {isGenerating && (
-              <div className="space-y-2">
-                <Progress value={progressValue} className="h-2" />
-                <p className="text-sm text-muted-foreground text-center">
-                  Generando cuestionario... {Math.round(progressValue)}%
-                </p>
-              </div>
-            )}
-
-            <form onSubmit={handleSubmitWithFiles} className="space-y-4">
-              <div className="space-y-2">
-                <label
-                  htmlFor="file-upload"
-                  className={`flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-lg transition-colors shadow-sm ${
-                    isGenerating 
-                      ? 'cursor-not-allowed bg-muted/30 opacity-50' 
-                      : 'cursor-pointer bg-muted/50 hover:bg-muted hover:shadow-md'
-                  }`}
-                >
-                  <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                    <FileUp className={`w-8 h-8 mb-4 ${isGenerating ? 'text-muted-foreground/50' : 'text-muted-foreground'}`} />
-                    <p className={`mb-2 text-sm ${isGenerating ? 'text-muted-foreground/50' : 'text-muted-foreground'}`}>
-                      <span className="font-semibold">
-                        {isGenerating ? 'Generando cuestionario...' : 'Haz clic para subir'}
-                      </span> {!isGenerating && 'o arrastra y suelta'}
-                    </p>
-                    <p className={`text-xs ${isGenerating ? 'text-muted-foreground/50' : 'text-muted-foreground'}`}>
-                      Archivos PDF o Markdown (MÁX. 10MB)
-                    </p>
-                  </div>
-                  <input
-                    id="file-upload"
-                    type="file"
-                    className="hidden"
-                    accept=".pdf,.md,.markdown"
-                    onChange={handleFileChange}
-                    disabled={isGenerating}
-                  />
-                </label>
-              </div>
-              <Button
-                type="submit"
-                className="w-full shadow-md hover:shadow-lg transition-shadow"
-                disabled={!selectedFile || isGenerating}
-              >
-                {isGenerating ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Generando Cuestionario...
-                  </>
-                ) : (
-                  "Generar Cuestionario"
-                )}
-              </Button>
-            </form>
-          </CardContent>
-          <CardFooter className="flex flex-col space-y-4">
-            <div className="text-xs text-muted-foreground text-center">
+            <Plus className="h-4 w-4 text-muted-foreground" />
+            <div className="rounded-full bg-primary/10 p-2">
+              <Loader2 className="size-6 text-primary" />
+            </div>
+          </div>
+          <div className="space-y-2">
+            <CardTitle className="text-2xl font-bold text-foreground">
+              Quiz Maker
+            </CardTitle>
+            <CardDescription className="text-xs sm:text-base text-muted-foreground">
               <p>
-                💡 <strong>Consejo:</strong> Podes subir archivos PDF o Markdown para generar cuestionarios interactivos!
+                Subí un archivo PDF o Markdown para generar un cuestionario interactivo basado en su contenido usando AI 🤖
+              </p>
+            </CardDescription>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {/* Generation Counter */}
+          <GenerationCounter
+            currentCount={generationCount}
+            maxGenerations={100}
+            remainingGenerations={remainingGenerations}
+          />
+
+          {selectedFile && (
+            <div className="p-3 rounded-lg border shadow-sm bg-green-50 dark:bg-green-950/20 border-green-200 dark:border-green-800">
+              <div className="flex items-center space-x-2">
+                <FileText className="h-4 w-4 text-green-600 dark:text-green-400" />
+                <span className="text-sm font-medium text-green-800 dark:text-green-200">
+                  Archivo listo para procesar: {selectedFile.name}
+                </span>
+              </div>
+            </div>
+          )}
+
+          {isGenerating && (
+            <div className="space-y-2">
+              <Progress value={progressValue} className="h-2" />
+              <p className="text-sm text-muted-foreground text-center">
+                Generando cuestionario... {Math.round(progressValue)}%
               </p>
             </div>
-          </CardFooter>
-        </Card>
-      </div>
-    </main>
+          )}
+
+          <form onSubmit={handleSubmitWithFiles} className="space-y-4">
+            <div className="space-y-2">
+              <label
+                htmlFor="file-upload"
+                className={`flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-lg transition-colors shadow-sm ${
+                  isGenerating 
+                    ? 'cursor-not-allowed bg-muted/30 opacity-50' 
+                    : 'cursor-pointer bg-muted/50 hover:bg-muted hover:shadow-md'
+                }`}
+              >
+                <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                  <FileUp className={`w-8 h-8 mb-4 ${isGenerating ? 'text-muted-foreground/50' : 'text-muted-foreground'}`} />
+                  <p className={`mb-2 text-sm ${isGenerating ? 'text-muted-foreground/50' : 'text-muted-foreground'}`}>
+                    <span className="font-semibold">
+                      {isGenerating ? 'Generando cuestionario...' : 'Haz clic para subir'}
+                    </span> {!isGenerating && 'o arrastra y suelta'}
+                  </p>
+                  <p className={`text-xs ${isGenerating ? 'text-muted-foreground/50' : 'text-muted-foreground'}`}>
+                    Archivos PDF o Markdown (MÁX. 10MB)
+                  </p>
+                </div>
+                <input
+                  id="file-upload"
+                  type="file"
+                  className="hidden"
+                  accept=".pdf,.md,.markdown"
+                  onChange={handleFileChange}
+                  disabled={isGenerating}
+                />
+              </label>
+            </div>
+            <Button
+              type="submit"
+              variant="secondary"
+              className="w-full shadow-md hover:shadow-lg transition-shadow"
+              disabled={!selectedFile || isGenerating}
+            >
+              {isGenerating ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Generando Cuestionario...
+                </>
+              ) : (
+                "Generar Cuestionario"
+              )}
+            </Button>
+          </form>
+        </CardContent>
+        <CardFooter className="flex flex-col space-y-4">
+          <div className="text-xs text-muted-foreground text-center">
+            <p>
+              💡 <strong>Consejo:</strong> Podes subir archivos PDF o Markdown para generar cuestionarios interactivos!
+            </p>
+          </div>
+        </CardFooter>
+      </Card>
+    </div>
   );
 }

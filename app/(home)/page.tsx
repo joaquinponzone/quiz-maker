@@ -65,41 +65,53 @@ export default function ChatWithFiles() {
 
   // Show loading while checking for last quiz and generation count
   if (isCheckingLastQuiz || isCheckingLimit) {
-    return <LoadingScreen />;
+    return (
+      <div className="min-h-screen bg-background text-foreground flex items-start justify-center p-4 animate-pulse">
+        <LoadingScreen />
+      </div>
+    );
   }
 
   // Show generation limit screen if user has reached the limit
   if (remainingGenerations === 0) {
-    return <GenerationLimit onReset={handleResetCounter} />;
+    return (
+      <div className="min-h-screen bg-background text-foreground flex items-center justify-center p-4">
+        <GenerationLimit onReset={handleResetCounter} />
+      </div>
+    );
   }
 
   // Show last quiz option if available
   if (lastQuiz && questions.length === 0) {
     return (
-      <LastQuizPrompt
-        lastQuiz={lastQuiz}
-        onContinueLastQuiz={(questions, title) => {
-          setQuestions(questions);
-          setTitle(title);
-        }}
-        onGenerateNewQuiz={() => {
-          setLastQuiz(null);
-          quizCache.deleteLastGeneratedQuiz().catch(console.error);
-        }}
-      />
+      <div className="min-h-screen p-4">
+        <LastQuizPrompt
+          lastQuiz={lastQuiz}
+          onContinueLastQuiz={(questions, title) => {
+            setQuestions(questions);
+            setTitle(title);
+          }}
+          onGenerateNewQuiz={() => {
+            setLastQuiz(null);
+            quizCache.deleteLastGeneratedQuiz().catch(console.error);
+          }}
+        />
+      </div>
     );
   }
 
   if (questions.length === 4) {
     return (
-      <Quiz title={title ?? "Cuestionario"} questions={questions} clearPDF={clearPDF} />
+      <div className="min-h-screen bg-background text-foreground">
+        <Quiz title={title ?? "Cuestionario"} questions={questions} clearPDF={clearPDF} />
+      </div>
     );
   }
 
   return (
     <QuizGenerator
       onQuizGenerated={(questions, title) => {
-        setQuestions(questions);
+          setQuestions(questions);
         setTitle(title);
       }}
       onLastQuizSaved={(lastQuiz) => {

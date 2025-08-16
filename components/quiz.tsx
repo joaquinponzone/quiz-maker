@@ -55,7 +55,7 @@ const QuestionCard: React.FC<{
             }`}
             onClick={() => onSelectAnswer(answerLabels[index])}
           >
-            <CardContent className="p-6">
+            <CardContent className="p-4 sm:p-6">
               <div className="flex items-start space-x-4">
                 <span className="text-lg font-medium text-muted-foreground shrink-0">
                   {answerLabels[index]}
@@ -238,97 +238,95 @@ export default function Quiz({
   }
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
-      <main className="container mx-auto px-4 py-12 max-w-4xl">
-        <h1 className="text-3xl font-bold mb-8 text-center text-foreground">
-          {title}
-        </h1>
-        <div className="relative">
-          {!isSubmitted && <Progress value={progress} className="h-1 mb-8" />}
-          <div className="min-h-[400px]">
-            {" "}
-            {/* Prevent layout shift */}
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={isSubmitted ? "results" : currentQuestionIndex}
-                initial={{ opacity: 1 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 1 }}
-                transition={{ duration: 0.3 }}
-              >
-                {!isSubmitted ? (
+    <main className="container mx-auto px-4 py-12 max-w-4xl">
+      <h1 className="text-3xl font-bold mb-8 text-center text-foreground">
+        {title}
+      </h1>
+      <div className="relative">
+        {!isSubmitted && <Progress value={progress} className="h-1 mb-8" />}
+        <div className="min-h-[400px]">
+          {" "}
+          {/* Prevent layout shift */}
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={isSubmitted ? "results" : currentQuestionIndex}
+              initial={{ opacity: 1 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 1 }}
+              transition={{ duration: 0.3 }}
+            >
+              {!isSubmitted ? (
+                <Card className="w-full shadow-lg">
+                  <CardContent className="px-4 py-6 sm:px-8 sm:py-8">
+                    <div className="space-y-8">
+                      <QuestionCard
+                        question={currentQuestion}
+                        selectedAnswer={answers[currentQuestionIndex]}
+                        onSelectAnswer={handleSelectAnswer}
+                        isSubmitted={isSubmitted}
+                        showCorrectAnswer={false}
+                      />
+                      <div className="flex justify-between items-center pt-4">
+                        <Button
+                          onClick={handlePreviousQuestion}
+                          disabled={currentQuestionIndex === 0}
+                          variant="ghost"
+                          className="hover:bg-accent"
+                        >
+                          <ChevronLeft className="mr-2 h-4 w-4" /> Anterior
+                        </Button>
+                        <span className="text-sm font-medium text-muted-foreground">
+                          {currentQuestionIndex + 1} / {questions.length}
+                        </span>
+                        <Button
+                          onClick={handleNextQuestion}
+                          disabled={answers[currentQuestionIndex] === null}
+                          variant="ghost"
+                          className="hover:bg-accent"
+                        >
+                          {currentQuestionIndex === questions.length - 1
+                            ? "Enviar"
+                            : "Siguiente"}{" "}
+                          <ChevronRight className="ml-2 h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ) : (
+                <div className="space-y-8">
+                  <QuizScore
+                    correctAnswers={score ?? 0}
+                    totalQuestions={questions.length}
+                  />
+                  <div className="space-y-12">
+                    <QuizReview questions={questions} userAnswers={answers} />
+                  </div>
                   <Card className="w-full shadow-lg">
-                    <CardContent className="p-8">
-                      <div className="space-y-8">
-                        <QuestionCard
-                          question={currentQuestion}
-                          selectedAnswer={answers[currentQuestionIndex]}
-                          onSelectAnswer={handleSelectAnswer}
-                          isSubmitted={isSubmitted}
-                          showCorrectAnswer={false}
-                        />
-                        <div className="flex justify-between items-center pt-4">
-                          <Button
-                            onClick={handlePreviousQuestion}
-                            disabled={currentQuestionIndex === 0}
-                            variant="ghost"
-                            className="hover:bg-accent"
-                          >
-                            <ChevronLeft className="mr-2 h-4 w-4" /> Anterior
-                          </Button>
-                          <span className="text-sm font-medium text-muted-foreground">
-                            {currentQuestionIndex + 1} / {questions.length}
-                          </span>
-                          <Button
-                            onClick={handleNextQuestion}
-                            disabled={answers[currentQuestionIndex] === null}
-                            variant="ghost"
-                            className="hover:bg-accent"
-                          >
-                            {currentQuestionIndex === questions.length - 1
-                              ? "Enviar"
-                              : "Siguiente"}{" "}
-                            <ChevronRight className="ml-2 h-4 w-4" />
-                          </Button>
-                        </div>
+                    <CardContent className="p-6">
+                      <div className="flex flex-col sm:flex-row justify-center gap-4">
+                        <Button
+                          onClick={handleReset}
+                          variant="outline"
+                          className="bg-secondary hover:bg-secondary/80 w-full"
+                        >
+                          <RefreshCw className="mr-2 h-4 w-4" /> Reiniciar Cuestionario
+                        </Button>
+                        <Button
+                          onClick={handleClearPDF}
+                          className="bg-primary hover:bg-primary/90 w-full"
+                        >
+                          <FileText className="mr-2 h-4 w-4" /> Probar Otro PDF
+                        </Button>
                       </div>
                     </CardContent>
                   </Card>
-                ) : (
-                  <div className="space-y-8">
-                    <QuizScore
-                      correctAnswers={score ?? 0}
-                      totalQuestions={questions.length}
-                    />
-                    <div className="space-y-12">
-                      <QuizReview questions={questions} userAnswers={answers} />
-                    </div>
-                    <Card className="w-full shadow-lg">
-                      <CardContent className="p-6">
-                        <div className="flex justify-center space-x-4">
-                          <Button
-                            onClick={handleReset}
-                            variant="outline"
-                            className="bg-secondary hover:bg-secondary/80 w-full"
-                          >
-                            <RefreshCw className="mr-2 h-4 w-4" /> Reiniciar Cuestionario
-                          </Button>
-                          <Button
-                            onClick={handleClearPDF}
-                            className="bg-primary hover:bg-primary/90 w-full"
-                          >
-                            <FileText className="mr-2 h-4 w-4" /> Probar Otro PDF
-                          </Button>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </div>
-                )}
-              </motion.div>
-            </AnimatePresence>
-          </div>
+                </div>
+              )}
+            </motion.div>
+          </AnimatePresence>
         </div>
-      </main>
-    </div>
+      </div>
+    </main>
   );
 }

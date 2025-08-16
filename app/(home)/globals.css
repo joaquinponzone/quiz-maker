@@ -20,6 +20,8 @@
         --accent-foreground: hsl(0 0% 20%);
         --destructive: hsl(359.5652 92.0000% 70.5882%);
         --destructive-foreground: hsl(0 0% 100%);
+        --success: hsl(142.1053 76.4706% 36.2745%);
+        --success-foreground: hsl(0 0% 100%);
         --border: hsl(325.5814 57.8475% 56.2745%);
         --input: hsl(0 0% 89.4118%);
         --ring: hsl(330 70.2381% 67.0588%);
@@ -36,9 +38,9 @@
         --sidebar-accent-foreground: hsl(0 0% 20%);
         --sidebar-border: hsl(268.6957 100.0000% 95.4902%);
         --sidebar-ring: hsl(330.3659 81.1881% 60.3922%);
-        --font-sans: Poppins, sans-serif;
-        --font-serif: Lora, serif;
-        --font-mono: "Fira Code", monospace;
+        --font-sans: var(--font-poppins), Poppins, sans-serif;
+        --font-serif: var(--font-lora), Lora, serif;
+        --font-mono: var(--font-fira-code), "Fira Code", monospace;
         --radius: 0.4rem;
         --shadow-2xs: 2px 2px 0px 0px hsl(325.78 58.18% 56.86% / 1);
         --shadow-xs: 3px 3px 0px 0px hsl(325.78 58.18% 56.86% / 1);
@@ -69,6 +71,8 @@
         --accent-foreground: hsl(333.75 40% 92.1569%);
         --destructive: hsl(328.4211 70.3704% 62.9412%);
         --destructive-foreground: hsl(201.4286 43.75% 12.549%);
+        --success: hsl(142.1053 70.5882% 45.098%);
+        --success-foreground: hsl(201.4286 43.75% 12.549%);
         --border: hsl(206.1538 28.0576% 27.2549%);
         --input: hsl(200.6897 31.1828% 18.2353%);
         --ring: hsl(184.1176 41.129% 51.3725%);
@@ -85,9 +89,9 @@
         --sidebar-accent-foreground: hsl(215 27.907% 16.8627%);
         --sidebar-border: hsl(216.9231 19.1176% 26.6667%);
         --sidebar-ring: hsl(330.3659 81.1881% 60.3922%);
-        --font-sans: Poppins, sans-serif;
-        --font-serif: Lora, serif;
-        --font-mono: "Fira Code", monospace;
+        --font-sans: var(--font-poppins), Poppins, sans-serif;
+        --font-serif: var(--font-lora), Lora, serif;
+        --font-mono: var(--font-fira-code), "Fira Code", monospace;
         --radius: 0.4rem;
         --shadow-2xs: 2px 2px 0px 0px hsl(206.1538 28.0576% 27.2549% / 1);
         --shadow-xs: 3px 3px 0px 0px hsl(206.1538 28.0576% 27.2549% / 1);
