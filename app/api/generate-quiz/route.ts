@@ -5,6 +5,7 @@ import { streamObject } from "ai";
 export const maxDuration = 60;
 
 export async function POST(req: Request) {
+  const defaultModel = process.env.OPENAI_MODEL || "gpt-4o-mini";
   const { files } = await req.json();
   
   if (!files || !files[0]) {
@@ -12,7 +13,7 @@ export async function POST(req: Request) {
   }
 
   const result = streamObject({
-    model: openai("gpt-4o-mini"),
+    model: openai(defaultModel),
     messages: [
       {
         role: "system",

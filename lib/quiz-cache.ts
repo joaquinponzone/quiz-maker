@@ -22,15 +22,23 @@ interface LastGeneratedQuiz {
   timestamp: number;
 }
 
+interface QuizCounter {
+  id: string;
+  count: number;
+  lastReset: number;
+}
+
 class QuizCache {
   private db: IDBDatabase | null = null;
   private readonly DB_NAME = 'QuizMakerDB';
   private readonly QUIZ_STORE = 'quizzes';
   private readonly LAST_QUIZ_STORE = 'lastGeneratedQuiz';
+  private readonly COUNTER_STORE = 'quizCounter';
+  private readonly MAX_GENERATIONS = 100;
 
   async init(): Promise<void> {
     return new Promise((resolve, reject) => {
-      const request = indexedDB.open(this.DB_NAME, 2); // Increment version for new store
+      const request = indexedDB.open(this.DB_NAME, 3); // Increment version for counter store
 
       request.onerror = () => reject(request.error);
       request.onsuccess = () => {
@@ -50,6 +58,11 @@ class QuizCache {
         // Create last generated quiz store
         if (!db.objectStoreNames.contains(this.LAST_QUIZ_STORE)) {
           db.createObjectStore(this.LAST_QUIZ_STORE, { keyPath: 'id' });
+        }
+
+        // Create counter store
+        if (!db.objectStoreNames.contains(this.COUNTER_STORE)) {
+          db.createObjectStore(this.COUNTER_STORE, { keyPath: 'id' });
         }
       };
     });
@@ -132,6 +145,98 @@ class QuizCache {
       request.onsuccess = () => resolve();
     });
   }
+
+  // Quiz counter methods
+  async getQuizCount(): Promise<number> {
+    if (!this.db) await this.init();
+
+    return new Promise((resolve, reject) => {
+      const transaction = this.db!.transaction([this.COUNTER_STORE], 'readonly');
+      const store = transaction.objectStore(this.COUNTER_STORE);
+      const request = store.get('counter');
+
+      request.onerror = () => reject(request.error);
+      request.onsuccess = () => {
+        const counter = request.result as QuizCounter | undefined;
+        resolve(counter?.count || 0);
+      };
+    });
+  }
+
+  async incrementQuizCount(): Promise<number> {
+    if (!this.db) await this.init();
+
+    return new Promise((resolve, reject) => {
+      const transaction = this.db!.transaction([this.COUNTER_STORE], 'readwrite');
+      const store = transaction.objectStore(this.COUNTER_STORE);
+      
+      // First get current count
+      const getRequest = store.get('counter');
+      
+      getRequest.onerror = () => reject(getRequest.error);
+      getRequest.onsuccess = () => {
+        const counter = getRequest.result as QuizCounter | undefined;
+        const newCount = (counter?.count || 0) + 1;
+        
+        // Update or create counter
+        const putRequest = store.put({
+          id: 'counter',
+          count: newCount,
+          lastReset: counter?.lastReset || Date.now()
+        });
+        
+        putRequest.onerror = () => reject(putRequest.error);
+        putRequest.onsuccess = () => resolve(newCount);
+      };
+    });
+  }
+
+  async canGenerateQuiz(): Promise<boolean> {
+    const count = await this.getQuizCount();
+    return count < this.MAX_GENERATIONS;
+  }
+
+  async getRemainingGenerations(): Promise<number> {
+    const count = await this.getQuizCount();
+    return Math.max(0, this.MAX_GENERATIONS - count);
+  }
+
+  async resetCounter(): Promise<void> {
+    if (!this.db) await this.init();
+
+    return new Promise((resolve, reject) => {
+      const transaction = this.db!.transaction([this.COUNTER_STORE], 'readwrite');
+      const store = transaction.objectStore(this.COUNTER_STORE);
+      const request = store.put({
+        id: 'counter',
+        count: 0,
+        lastReset: Date.now()
+      });
+
+      request.onerror = () => reject(request.error);
+      request.onsuccess = () => resolve();
+    });
+  }
+
+  // Utility method for testing - set counter to a specific value
+  async setCounterValue(value: number): Promise<void> {
+    if (!this.db) await this.init();
+
+    return new Promise((resolve, reject) => {
+      const transaction = this.db!.transaction([this.COUNTER_STORE], 'readwrite');
+      const store = transaction.objectStore(this.COUNTER_STORE);
+      const request = store.put({
+        id: 'counter',
+        count: Math.max(0, Math.min(value, this.MAX_GENERATIONS)),
+        lastReset: Date.now()
+      });
+
+      request.onerror = () => reject(request.error);
+      request.onsuccess = () => resolve();
+    });
+  }
+
+
 
   async clearOldQuizzes(maxAge: number = 24 * 60 * 60 * 1000): Promise<void> {
     if (!this.db) await this.init();

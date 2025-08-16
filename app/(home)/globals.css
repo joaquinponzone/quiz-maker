@@ -38,7 +38,7 @@
         --sidebar-ring: hsl(330.3659 81.1881% 60.3922%);
         --font-sans: Poppins, sans-serif;
         --font-serif: Lora, serif;
-        --font-mono: Fira Code, monospace;
+        --font-mono: "Fira Code", monospace;
         --radius: 0.4rem;
         --shadow-2xs: 2px 2px 0px 0px hsl(325.78 58.18% 56.86% / 1);
         --shadow-xs: 3px 3px 0px 0px hsl(325.78 58.18% 56.86% / 1);
@@ -87,7 +87,7 @@
         --sidebar-ring: hsl(330.3659 81.1881% 60.3922%);
         --font-sans: Poppins, sans-serif;
         --font-serif: Lora, serif;
-        --font-mono: Fira Code, monospace;
+        --font-mono: "Fira Code", monospace;
         --radius: 0.4rem;
         --shadow-2xs: 2px 2px 0px 0px hsl(206.1538 28.0576% 27.2549% / 1);
         --shadow-xs: 3px 3px 0px 0px hsl(206.1538 28.0576% 27.2549% / 1);
@@ -105,7 +105,20 @@
         @apply border-border;
     }
     body {
-        @apply bg-background text-foreground;
+        @apply bg-background text-foreground font-sans;
+    }
+    
+    h1, h2, h3, h4, h5, h6 {
+        font-weight: 600;
+        letter-spacing: -0.025em;
+    }
+    
+    .font-medium {
+        font-weight: 500;
+    }
+    
+    .font-semibold {
+        font-weight: 600;
     }
 }
 

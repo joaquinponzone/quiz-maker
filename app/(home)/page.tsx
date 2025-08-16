@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { AnimatePresence, motion } from "framer-motion";
-import { FileUp, Loader2, Plus, FileText, RefreshCcw, FileInput } from "lucide-react";
+import { FileUp, Loader2, Plus, FileText, RefreshCcw, FileInput, FilePlus2, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
@@ -14,6 +14,8 @@ import { encodeFileAsBase64 } from "@/lib/utils";
 import { generateQuizTitle } from "./actions";
 import { quizCache, LastGeneratedQuiz } from "@/lib/quiz-cache";
 import Quiz from "@/components/quiz";
+import GenerationLimit from "@/components/generation-limit";
+import GenerationCounter from "@/components/generation-counter";
 
 export default function ChatWithFiles() {
   const [isDragging, setIsDragging] = useState(false);
@@ -24,23 +26,34 @@ export default function ChatWithFiles() {
   const [progress, setProgress] = useState(0);
   const [lastQuiz, setLastQuiz] = useState<LastGeneratedQuiz | null>(null);
   const [isCheckingLastQuiz, setIsCheckingLastQuiz] = useState(true);
+  const [generationCount, setGenerationCount] = useState(0);
+  const [remainingGenerations, setRemainingGenerations] = useState(100);
+  const [isCheckingLimit, setIsCheckingLimit] = useState(true);
 
-  // Check for last generated quiz on page load
+  // Check for last generated quiz and generation count on page load
   useEffect(() => {
-    const checkLastQuiz = async () => {
+    const checkInitialData = async () => {
       try {
+        // Check last quiz
         const savedQuiz = await quizCache.getLastGeneratedQuiz();
         if (savedQuiz) {
           setLastQuiz(savedQuiz);
         }
+
+        // Check generation count
+        const count = await quizCache.getQuizCount();
+        const remaining = await quizCache.getRemainingGenerations();
+        setGenerationCount(count);
+        setRemainingGenerations(remaining);
       } catch (error) {
-        console.error("Error checking last quiz:", error);
+        console.error("Error checking initial data:", error);
       } finally {
         setIsCheckingLastQuiz(false);
+        setIsCheckingLimit(false);
       }
     };
 
-    checkLastQuiz();
+    checkInitialData();
   }, []);
 
   const { submit, object: partialQuestions, isLoading: isGenerating } = useObject({
@@ -62,6 +75,12 @@ export default function ChatWithFiles() {
             fileData: fileData,
             timestamp: Date.now()
           });
+
+          // Increment generation count
+          const newCount = await quizCache.incrementQuizCount();
+          const newRemaining = await quizCache.getRemainingGenerations();
+          setGenerationCount(newCount);
+          setRemainingGenerations(newRemaining);
         } catch (error) {
           console.error("Error saving last quiz:", error);
         }
@@ -118,6 +137,13 @@ export default function ChatWithFiles() {
       return;
     }
 
+    // Check if user can generate more quizzes
+    const canGenerate = await quizCache.canGenerateQuiz();
+    if (!canGenerate) {
+      toast.error("Has alcanzado el límite de generaciones. Solicita acceso administrativo.");
+      return;
+    }
+
     // Send the original file directly to the API
     const encodedFile = await encodeFileAsBase64(selectedFile);
     submit({
@@ -142,10 +168,22 @@ export default function ChatWithFiles() {
     quizCache.deleteLastGeneratedQuiz().catch(console.error);
   };
 
+  const handleResetCounter = async () => {
+    try {
+      await quizCache.resetCounter();
+      setGenerationCount(0);
+      setRemainingGenerations(100);
+      toast.success("Contador reiniciado exitosamente");
+    } catch (error) {
+      console.error("Error resetting counter:", error);
+      toast.error("Error al reiniciar el contador");
+    }
+  };
+
   const progressValue = partialQuestions ? (partialQuestions.length / 4) * 100 : 0;
 
-  // Show loading while checking for last quiz
-  if (isCheckingLastQuiz) {
+  // Show loading while checking for last quiz and generation count
+  if (isCheckingLastQuiz || isCheckingLimit) {
     return (
       <div className="min-h-screen bg-background text-foreground flex items-start justify-center">
         <Card className="w-full max-w-md shadow-lg p-6 mt-32">
@@ -158,6 +196,11 @@ export default function ChatWithFiles() {
         </Card>
       </div>
     );
+  }
+
+  // Show generation limit screen if user has reached the limit
+  if (remainingGenerations === 0) {
+    return <GenerationLimit onReset={handleResetCounter} />;
   }
 
   // Show last quiz option if available
@@ -178,9 +221,9 @@ export default function ChatWithFiles() {
                 setQuestions(lastQuiz.questions);
                 setTitle(lastQuiz.title);
               }}
-              className="flex gap-2 w-full shadow-md hover:shadow-lg transition-shadow text-lg"
+              className="flex gap-2 w-full shadow-md hover:shadow-lg transition-shadow text-md"
             >
-              <RefreshCcw className="size-4" /> Continuar con el último cuestionario
+              <RefreshCcw /> Repetir el último cuestionario
             </Button>
             <Button
               onClick={() => {
@@ -188,9 +231,9 @@ export default function ChatWithFiles() {
                 quizCache.deleteLastGeneratedQuiz().catch(console.error);
               }}
               variant="outline"
-              className="flex gap-2 w-full shadow-md hover:shadow-lg transition-shadow text-lg"
+              className="flex gap-2 w-full shadow-md hover:shadow-lg transition-shadow text-md"
             >
-              <RefreshCcw className="size-4" /> Generar nuevo cuestionario
+              <FilePlus2 /> Generar nuevo cuestionario
             </Button>
           </CardContent>
         </Card>
@@ -248,7 +291,7 @@ export default function ChatWithFiles() {
             </motion.div>
           )}
         </AnimatePresence>
-        <Card className="w-full max-w-md h-full border h-fit mt-12 shadow-lg">
+        <Card className="w-full max-w-md h-full border mt-12 shadow-lg">
           <CardHeader className="text-center space-y-6">
             <div className="mx-auto flex items-center justify-center space-x-2 text-muted-foreground">
               <div className="rounded-full bg-primary/10 p-2">
@@ -264,16 +307,20 @@ export default function ChatWithFiles() {
                 Quiz Maker
               </CardTitle>
               <CardDescription className="text-base text-muted-foreground">
-                Subí un archivo PDF o Markdown para generar un cuestionario interactivo basado en su contenido
-                usando el <Link href="https://sdk.vercel.ai">AI SDK</Link> y{" "}
-                <Link href="https://sdk.vercel.ai/providers/ai-sdk-providers/openai">
-                  GPT-4o Mini de OpenAI
-                </Link>
-                .
+                <p>
+                  Subí un archivo PDF o Markdown para generar un cuestionario interactivo basado en su contenido usando AI 🤖
+                </p>
               </CardDescription>
             </div>
           </CardHeader>
           <CardContent className="space-y-4">
+            {/* Generation Counter */}
+            <GenerationCounter
+              currentCount={generationCount}
+              maxGenerations={100}
+              remainingGenerations={remainingGenerations}
+            />
+
             {selectedFile && (
               <div className="p-3 rounded-lg border shadow-sm bg-green-50 dark:bg-green-950/20 border-green-200 dark:border-green-800">
                 <div className="flex items-center space-x-2">
@@ -334,7 +381,7 @@ export default function ChatWithFiles() {
               </Button>
             </form>
           </CardContent>
-          <CardFooter className="flex flex-col space-y-2">
+          <CardFooter className="flex flex-col space-y-4">
             <div className="text-xs text-muted-foreground text-center">
               <p>
                 💡 <strong>Consejo:</strong> Podes subir archivos PDF o Markdown para generar cuestionarios interactivos!

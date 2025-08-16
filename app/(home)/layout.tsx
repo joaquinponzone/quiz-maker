@@ -2,9 +2,19 @@ import "./globals.css";
 import { Metadata } from "next";
 import { Toaster } from "sonner";
 import { ThemeProvider } from "next-themes";
-import { Geist } from "next/font/google";
+import { Poppins, Lora } from "next/font/google";
 
-const geist = Geist({ subsets: ["latin"] });
+const poppins = Poppins({ 
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-poppins"
+});
+
+const lora = Lora({ 
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-lora"
+});
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://quiz-maker.vercel.app"),
@@ -18,7 +28,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning className={`${geist.className}`}>
+    <html lang="en" suppressHydrationWarning className={`${poppins.className} ${lora.className}`}>
+      <head>
+        <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&display=swap"
+        />
+      </head>
       <body className="flex flex-col min-h-screen justify-between">
         <ThemeProvider attribute="class" enableSystem forcedTheme="light">
           <Toaster position="top-center" richColors />
@@ -36,3 +52,5 @@ export default function RootLayout({
     </html>
   );
 }
+
+

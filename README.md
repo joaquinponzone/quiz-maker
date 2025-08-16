@@ -9,6 +9,8 @@
 - **🎯 Interactive Quizzes**: Multiple choice questions with instant feedback
 - **💾 Persistent Storage**: Quiz progress saved with IndexedDB
 - **🔄 Resume Sessions**: Continue where you left off after page refresh
+- **📊 Generation Counter**: Track and limit quiz generations (100 limit)
+- **🔒 Admin Access Control**: Request administrative access when limit is reached
 - **🌍 Spanish Language**: Fully localized interface and AI responses
 - **🎨 Brutalist Design**: Sharp, modern UI with crisp shadows
 - **📱 Responsive**: Works perfectly on desktop and mobile
@@ -63,6 +65,23 @@
 3. **Take the Quiz**: Answer questions with real-time progress tracking
 4. **Review Results**: See your score and review correct answers
 5. **Save Progress**: Your quiz state is automatically saved for later
+6. **Track Usage**: Monitor your quiz generation count and remaining generations
+
+## 📊 Generation Counter Feature
+
+The app includes a built-in generation counter that:
+
+- **Tracks Usage**: Counts every quiz generation in IndexedDB
+- **Enforces Limits**: Maximum of 100 quiz generations per user
+- **Visual Feedback**: Shows progress bar and remaining generations
+- **Admin Access**: When limit is reached, users can request administrative access
+- **Demo Mode**: Includes development tools for testing the counter functionality
+
+### Counter States
+
+- **Normal**: 0-89 generations - Full access to quiz generation
+- **Warning**: 90-99 generations - Warning message about approaching limit
+- **Limited**: 100 generations - Access blocked, admin request required
 
 ## 🛠️ Tech Stack
 
@@ -90,7 +109,14 @@ quiz-maker/
 ├── lib/
 │   ├── schemas.ts         # Zod schemas for validation
 │   ├── utils.ts           # Utility functions
-│   └── quiz-cache.ts      # IndexedDB caching logic
+│   └── quiz-cache.ts      # IndexedDB caching logic with generation counter
+├── components/
+│   ├── ui/                # Shadcn/ui components
+│   ├── quiz.tsx           # Main quiz component
+│   ├── score.tsx          # Score display
+│   ├── quiz-overview.tsx  # Quiz review component
+│   ├── generation-counter.tsx # Generation counter display
+│   └── generation-limit.tsx   # Limit reached screen
 └── public/                # Static assets
 ```
 
@@ -106,9 +132,10 @@ This project embraces **brutalist design principles**:
 
 ### Environment Variables
 
-| Variable | Description | Required |
-|----------|-------------|----------|
-| `OPENAI_API_KEY` | Your OpenAI API key | ✅ |
+| Variable | Description | Required | Default |
+|----------|-------------|----------|---------|
+| `OPENAI_API_KEY` | Your OpenAI API key | ✅ | - |
+
 
 ### Customization
 
@@ -116,6 +143,7 @@ This project embraces **brutalist design principles**:
 - **Question Count**: Modify the schema in `lib/schemas.ts`
 - **Styling**: Update colors in `app/(preview)/globals.css`
 - **Language**: Change prompts in the API route for different languages
+
 
 ## 🚀 Deployment
 

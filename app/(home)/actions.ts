@@ -5,8 +5,9 @@ import { generateObject } from "ai";
 import { z } from "zod";
 
 export const generateQuizTitle = async (file: string) => {
+  const defaultModel = process.env.OPENAI_MODEL || "gpt-4o-mini";
   const result = await generateObject({
-    model: openai("gpt-4o-mini"),
+    model: openai(defaultModel),
     schema: z.object({
       title: z
         .string()
