@@ -17,7 +17,7 @@ export default function LastQuizPrompt({
   onGenerateNewQuiz,
 }: LastQuizPromptProps) {
   return (
-    <div className="min-h-screen bg-background text-foreground flex items-center justify-center">
+    <div className="min-h-screen bg-background text-foreground flex items-start py-32 justify-center">
       <Card className="w-full max-w-xl shadow-lg p-6">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl font-bold">¿Continuar con el último cuestionario?</CardTitle>

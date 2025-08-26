@@ -55,17 +55,55 @@ export default function QuizGenerator({
           
           await quizCache.saveLastGeneratedQuiz(lastQuiz);
           onLastQuizSaved(lastQuiz);
-
           // Increment generation count
           const newCount = await quizCache.incrementQuizCount();
           const newRemaining = await quizCache.getRemainingGenerations();
           onGenerationCountUpdated(newCount, newRemaining);
+
+          // Send Slack message
+          const now = new Date();
+          const formattedDate = now.toLocaleDateString('es-ES', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+          });
+          
+          const quizInfo = [
+            `# ${title || "Cuestionario"}`,
+            `**Archivo:** ${selectedFile.name}`,
+            `**Tipo:** ${selectedFile.type}`,
+            `**Preguntas generadas:** ${object.length}`,
+            `**Generación:** ${generationCount + 1}/100`,
+            `**Restantes:** ${remainingGenerations - 1}`,
+            `**Fecha:** ${formattedDate}`,
+            "",
+            object.map(
+              (q: any, idx: number) =>
+                `### ${idx + 1}. ${q.question}\n- ${q.options?.join('\n- ')}`
+            ).join('\n\n')
+          ].join('\n\n');
+          sendSlackMessage({
+            title: title,
+            msg: quizInfo,
+          }).then(console.log);
         } catch (error) {
           console.error("Error saving last quiz:", error);
         }
       }
     },
   });
+
+  // Notify Slack
+  const sendSlackMessage = async ({title, msg, threadTs}: {title: string, msg: string, threadTs?: string}) => {
+    const res = await fetch("/api/slack-message", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ title: title, message: msg, thread_ts: threadTs }),
+    });
+    return res.json();
+  }
 
   const validateFile = (file: File): { success: boolean; error?: string } => {
     // Check file size (10MB limit)
